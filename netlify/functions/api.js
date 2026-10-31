@@ -1,4 +1,3 @@
-// Netlify Function version of the panel backend (stateless: sessions are signed cookies).
 const crypto = require('crypto');
 const SftpClient = require('ssh2-sftp-client');
 
@@ -9,11 +8,11 @@ const sftpCfg = {
   readyTimeout: 8000,
 };
 const PATHS = {
-  profiles: env.PROFILE_DIR || '/panel/profiles',
+  profiles: env.PROFILE_DIR || '/plugins/webpanel/profiles',
   shops: env.CHESTSHOP_FILE || '/plugins/data/chestshops.json',
   warps: env.PLAYERWARPS_FILE || '/plugins/data/playerwarps.json',
 };
-const BEDROCK_PREFIX = env.BEDROCK_PREFIX || '.';
+const BEDROCK_PREFIX = env.BEDROCK_PREFIX || '_';
 const SECRET = env.SESSION_SECRET;
 const TTL = 8 * 3600;
 
@@ -31,11 +30,15 @@ const verify = (pw, stored) => {
   const a = crypto.scryptSync(pw, Buffer.from(s, 'hex'), 64), b = Buffer.from(h, 'hex');
   return a.length === b.length && crypto.timingSafeEqual(a, b);
 };
-const validName = (n) => typeof n === 'string' && /^\.?[A-Za-z0-9_]{2,16}$/.test(n);
-const profilePath = (n) => `${PATHS.profiles}/${n.startsWith('.') ? 'bedrock_' + n.slice(1) : n}.json`.toLowerCase();
-const resolveName = ({ username, bedrock }) => (bedrock && validName(username) && !username.startsWith('.') ? BEDROCK_PREFIX + username : username);
+const validName = (n) => typeof n === 'string' && /^[A-Za-z0-9_]{2,16}$/.test(n);
+const profilePath = (n) => `${PATHS.profiles}/${n}.json`.toLowerCase();
+const resolveName = ({ username, bedrock }) => {
+  if (typeof username !== 'string') return username;
+  const u = username.trim();
+  if (!bedrock || u.startsWith(BEDROCK_PREFIX)) return u;
+  return (BEDROCK_PREFIX + u.replace(/ /g, '_')).slice(0, 16); // Floodgate truncates to 16
+};
 
-// ---- signed-cookie sessions ----
 const sign = (data) => crypto.createHmac('sha256', SECRET).update(data).digest('base64url');
 const makeToken = (u) => { const d = Buffer.from(JSON.stringify({ u, exp: Date.now() + TTL * 1000 })).toString('base64url'); return d + '.' + sign(d); };
 const readToken = (event) => {
