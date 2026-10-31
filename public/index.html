@@ -32,13 +32,13 @@
       try {
         const res = await fetch('/api/me');
         if (res.status === 401) return location.replace('login.html');
-        const d = await res.json();
+        const d = await res.json().catch(() => { throw new Error(`The API answered with HTTP ${res.status} instead of JSON. The Netlify function is not running at /api.`); });
         if (!res.ok) throw new Error(d.error);
         $('name').textContent = d.username;
         $('shops').textContent = d.chestshops;
         $('warps').textContent = d.playerwarps;
         // Bedrock names carry a prefix; skins come from the Java name underneath it.
-        const javaName = encodeURIComponent(d.username.replace(/^\./, ''));
+        const javaName = encodeURIComponent(d.username.replace(/^_/, ''));
         const f = $('craftyEmbed');
         f.src = `https://crafty.gg/embed/player/${javaName}?accent=magenta&capes=0&location=0&bio=0&uuid=0&first_seen=0&locator=off&view=bust`;
         f.hidden = false;
