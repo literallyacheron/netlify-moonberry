@@ -3,8 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Login page for MoonberrySMP's Control Panel.">
-  <title>MoonberrySMP Control Panel Login</title>
+  <title>MoonberrySMP Control Panel</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@400;700&family=Arimo:wght@400;700&display=swap" rel="stylesheet">
@@ -12,60 +11,47 @@
 </head>
 <body>
   <main class="wrap">
-    <h1 class="page-title">Login to MoonberrySMP Control Panel</h1>
-    <form id="form" novalidate>
-      <div class="login-grid">
-        <div>
-          <div class="field"><label for="username">Username</label>
-            <input id="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>
-          <div class="field"><label for="password">Password</label>
-            <input id="password" type="password" autocomplete="current-password" required></div>
-        </div>
-        <div class="divider" aria-hidden="true"></div>
-        <div>
-          <div class="check"><input type="checkbox" id="bedrock"><label for="bedrock">I play on Bedrock.</label></div>
-          <div class="check"><input type="checkbox" id="first"><label for="first">This is my first time logging into my Panel.</label></div>
-          <p class="muted" id="hint" hidden>Choose a password of at least 8 characters.</p>
-        </div>
-      </div>
-      <div class="actions">
-        <button class="shimmer-button" id="submit" type="submit">Log in</button>
-      </div>
-      <p class="msg" id="msg" role="alert"></p>
-    </form>
+    <header class="topbar page-title">
+      <h1 style="font-size:inherit">MoonberrySMP Control Panel</h1>
+      <button class="link-button" id="logout" type="button">Log out</button>
+    </header>
+    <section class="player" aria-live="polite">
+      <div class="skin"><iframe id="craftyEmbed" title="Player skin" loading="lazy" hidden></iframe></div>
+      <h4 id="name">Loading…</h4>
+    </section>
+    <dl class="stats">
+      <div><dt>Chestshops:</dt><dd id="shops">…</dd></div>
+      <div><dt>Playerwarps:</dt><dd id="warps">…</dd></div>
+    </dl>
+    <p class="msg err" id="msg" role="alert"></p>
   </main>
   <script>
     const $ = (id) => document.getElementById(id);
-    const form = $('form'), msg = $('msg'), btn = $('submit');
 
-    fetch('/api/me').then((r) => { if (r.ok) location.replace('index.html'); }).catch(() => {});
-
-    function sync() {
-      const first = $('first').checked;
-      $('hint').hidden = !first;
-      $('password').autocomplete = first ? 'new-password' : 'current-password';
-      btn.textContent = first ? 'Create panel' : 'Log in';
-    }
-    $('first').addEventListener('change', sync);
-
-    form.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      msg.className = 'msg'; msg.textContent = '';
-      const username = $('username').value.trim(), password = $('password').value;
-      if (!username || !password) { msg.className = 'msg err'; msg.textContent = 'Enter your username and password.'; return; }
-      btn.disabled = true;
+    async function load() {
       try {
-        const res = await fetch($('first').checked ? '/api/register' : '/api/login', {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ username, password, bedrock: $('bedrock').checked }),
-        });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || 'Something went wrong.');
-        location.replace('index.html');
+        const res = await fetch('/api/me');
+        if (res.status === 401) return location.replace('login.html');
+        const d = await res.json().catch(() => { throw new Error(`The API answered with HTTP ${res.status} instead of JSON. The Netlify function is not running at /api.`); });
+        if (!res.ok) throw new Error(d.error);
+        $('name').textContent = d.username;
+        $('shops').textContent = d.chestshops;
+        $('warps').textContent = d.playerwarps;
+        const javaName = encodeURIComponent(d.username.replace(/^_/, ''));
+        const f = $('craftyEmbed');
+        f.src = `https://crafty.gg/embed/player/${javaName}?accent=magenta&capes=0&location=0&bio=0&uuid=0&first_seen=0&locator=off&view=bust`;
+        f.hidden = false;
       } catch (err) {
-        msg.className = 'msg err'; msg.textContent = err.message; btn.disabled = false;
+        $('name').textContent = 'Unavailable';
+        $('shops').textContent = $('warps').textContent = '–';
+        $('msg').textContent = err.message || 'Could not load your data.';
       }
+    }
+    $('logout').addEventListener('click', async () => {
+      await fetch('/api/logout', { method: 'POST' }).catch(() => {});
+      location.replace('login.html');
     });
+    load();
   </script>
 </body>
 </html>
