@@ -8,7 +8,7 @@ const sftpCfg = {
   readyTimeout: 8000,
 };
 const PATHS = {
-  profiles: env.PROFILE_DIR || ''
+  profiles: env.PROFILE_DIR || '/plugins/webpanel/profiles',
   shops: env.CHESTSHOP_FILE || '/plugins/data/chestshops.json',
   warps: env.PLAYERWARPS_FILE || '/plugins/data/playerwarps.json',
 };
