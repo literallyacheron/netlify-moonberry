@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Login page for MoonberrySMP's Control Panel.">
+  <title>MoonberrySMP Control Panel Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Sulphur+Point:wght@400;700&family=Arimo:wght@400;700&display=swap" rel="stylesheet">
+  <link href="style.css" rel="stylesheet">
+</head>
+<body>
+  <main class="wrap">
+    <h1 class="page-title">Login to MoonberrySMP Control Panel</h1>
+    <form id="form" novalidate>
+      <div class="login-grid">
+        <div>
+          <div class="field"><label for="username">Username</label>
+            <input id="username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required></div>
+          <div class="field"><label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required></div>
+        </div>
+        <div class="divider" aria-hidden="true"></div>
+        <div>
+          <div class="check"><input type="checkbox" id="bedrock"><label for="bedrock">I play on Bedrock.</label></div>
+          <div class="check"><input type="checkbox" id="first"><label for="first">This is my first time logging into my Panel.</label></div>
+          <p class="muted" id="hint" hidden>Choose a password of at least 8 characters.</p>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="shimmer-button" id="submit" type="submit">Log in</button>
+      </div>
+      <p class="msg" id="msg" role="alert"></p>
+    </form>
+  </main>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const form = $('form'), msg = $('msg'), btn = $('submit');
+
+    fetch('/api/me').then((r) => { if (r.ok) location.replace('index.html'); }).catch(() => {});
+
+    function sync() {
+      const first = $('first').checked;
+      $('hint').hidden = !first;
+      $('password').autocomplete = first ? 'new-password' : 'current-password';
+      btn.textContent = first ? 'Create panel' : 'Log in';
+    }
+    $('first').addEventListener('change', sync);
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.className = 'msg'; msg.textContent = '';
+      const username = $('username').value.trim(), password = $('password').value;
+      if (!username || !password) { msg.className = 'msg err'; msg.textContent = 'Enter your username and password.'; return; }
+      btn.disabled = true;
+      try {
+        const res = await fetch($('first').checked ? '/api/register' : '/api/login', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password, bedrock: $('bedrock').checked }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Something went wrong.');
+        location.replace('index.html');
+      } catch (err) {
+        msg.className = 'msg err'; msg.textContent = err.message; btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
