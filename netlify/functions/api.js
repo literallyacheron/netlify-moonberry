@@ -1,3 +1,4 @@
+// Netlify Function version of the panel backend (stateless: sessions are signed cookies).
 const crypto = require('crypto');
 const SftpClient = require('ssh2-sftp-client');
 
@@ -39,6 +40,7 @@ const resolveName = ({ username, bedrock }) => {
   return (BEDROCK_PREFIX + u.replace(/ /g, '_')).slice(0, 16); // Floodgate truncates to 16
 };
 
+// ---- signed-cookie sessions ----
 const sign = (data) => crypto.createHmac('sha256', SECRET).update(data).digest('base64url');
 const makeToken = (u) => { const d = Buffer.from(JSON.stringify({ u, exp: Date.now() + TTL * 1000 })).toString('base64url'); return d + '.' + sign(d); };
 const readToken = (event) => {
@@ -62,7 +64,7 @@ const reply = (code, obj, headers = {}) => ({ statusCode: code, headers: { 'Cont
 exports.handler = async (event) => {
   if (!SECRET || SECRET.length < 32) return reply(500, { error: 'Server is not configured.' });
   const route = event.path.split('/').pop();
-  const ip = event.headers['x-nf-client-connection-ip'] || 'unknown';
+  const ip = event.headers['x-nf-client-connection-ip'] || String(event.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown';
   let body = {};
   try { body = event.body ? JSON.parse(event.body) : {}; } catch { return reply(400, { error: 'Bad request.' }); }
   const down = (e) => { console.error(e.message); return reply(502, { error: 'Could not reach the server. Try again shortly.' }); };
