@@ -1,44 +1,353 @@
-:root{
-  --plum:#702670; --pink:#ff78ac; --ink:#fff; --muted:rgba(255,255,255,.75); --line:rgba(255,255,255,.5);
-  --font-head:'Arimo',system-ui,sans-serif; --font-body:'Sulphur Point',system-ui,sans-serif;
+:root {
+    --plum: #4D2963;
+    --darkgray: #4A4863;
+    --ink: #fff;
+    --muted: rgba(255,255,255,.75);
+    --line: rgba(255,255,255,.5);
+    --font-head: 'Arimo',system-ui,sans-serif;
+    --font-body: 'Sulphur Point',system-ui,sans-serif;
 }
-*{box-sizing:border-box}
-html{min-height:100%;background:linear-gradient(45deg,var(--plum),var(--pink)) fixed;color:var(--ink);font-family:var(--font-body)}
-body{margin:0;min-height:100vh;padding:clamp(12px,3vw,32px)}
-h1,h2,h4{font-family:var(--font-head);margin:0}
-.wrap{max-width:860px;margin-inline:auto}
-.page-title{font-size:clamp(20px,4vw,30px);font-weight:700;padding-bottom:10px;border-bottom:1px solid var(--line);margin-bottom:24px}
-.page-title.center{text-align:center}
-.muted{color:var(--muted)}
-label{display:block;opacity:.85;margin-bottom:4px}
-input[type=text],input[type=password]{width:100%;padding:8px 10px;border:1px solid var(--line);border-radius:8px;background:rgba(255,255,255,.12);color:var(--ink);font:inherit}
-input::placeholder{color:rgba(255,255,255,.5)}
-:focus-visible{outline:2px solid #fff;outline-offset:2px}
-.login-grid{display:grid;grid-template-columns:minmax(0,1fr) 1px minmax(0,1fr);gap:clamp(16px,4vw,32px);align-items:center}
-.divider{background:var(--line);align-self:stretch}
-.field{margin-bottom:14px}
-.check{display:flex;align-items:center;gap:8px;margin-bottom:14px}
-.check input{width:16px;height:16px;flex:none;margin:0}
-.check label{margin:0;opacity:1}
-.actions{margin-top:24px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
-.msg{min-height:1.4em;margin-top:12px;font-weight:700}
-.msg.err{color:#ffe0e8;text-shadow:0 0 6px #c00}
-@media (max-width:640px){.login-grid{grid-template-columns:1fr}.divider{display:none}}
 
-.shimmer-button{font:500 18px var(--font-head);color:#fff;background:transparent;border:2px solid #fff;border-radius:12px;padding:7px 22px;cursor:pointer;position:relative;overflow:hidden;z-index:1;transition:border-color .4s}
-.shimmer-button::before,.shimmer-button::after{content:'';position:absolute;top:-60%;left:-60%;width:220%;height:220%;background-repeat:no-repeat;background-size:200% 200%;background-position:100% 100%;opacity:0;transition:opacity .3s}
-.shimmer-button::before{background-image:linear-gradient(135deg,rgba(255,0,94,0) 30%,rgba(255,0,94,.55) 50%,rgba(255,0,94,0) 70%);filter:blur(24px);z-index:-1}
-.shimmer-button::after{background-image:linear-gradient(135deg,rgba(255,125,255,0) 20%,rgba(255,125,255,.45) 50%,rgba(255,125,255,0) 65%);filter:blur(14px);z-index:-2}
-.shimmer-button:hover::before,.shimmer-button:focus-visible::before{opacity:1;animation:swirl 2.5s ease-in-out forwards}
-.shimmer-button:hover::after,.shimmer-button:focus-visible::after{opacity:1;animation:swirl 3s ease-in-out .2s forwards}
-.shimmer-button:disabled{opacity:.6;cursor:wait}
-.link-button{background:none;border:0;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer}
-@keyframes swirl{0%{background-position:100% 100%}60%{background-position:30% 30%}75%{background-position:20% 35%}90%{background-position:35% 20%}100%{background-position:30% 30%}}
-@media (prefers-reduced-motion:reduce){.shimmer-button::before,.shimmer-button::after{animation:none!important}}
+* {
+    box-sizing: border-box;
+}
 
-.player{display:flex;flex-wrap:wrap;gap:20px;align-items:center}
-.skin{width:125px;height:130px;overflow:hidden;border-radius:8px;flex:none}
-.skin iframe{border:0;width:480px;height:188px;max-width:none;transform:scale(.7);transform-origin:top left;background:transparent}
-.stats{display:flex;flex-wrap:wrap;gap:8px 28px;margin:14px 0 0;padding:12px 0 0;border-top:1px solid var(--line);font-size:14px}
-.stats dt{display:inline;opacity:.8}.stats dd{display:inline;margin:0 0 0 4px;font-weight:700}
-topbar,.topbar{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}
+html {
+    min-height: 100%;
+    background: linear-gradient(45deg,var(--plum) 1%, var(--darkgray)) 99% fixed;
+    color: var(--ink);
+    font-family: var(--font-body);
+}
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    padding: clamp(12px,3vw,32px);
+}
+
+h1,
+h2,
+h4 {
+    font-family: var(--font-head);
+    margin: 0;
+}
+
+.wrap {
+    max-width: 860px;
+    margin-inline: auto;
+}
+
+.page-title {
+    font-size: clamp(20px,4vw,30px);
+    font-weight: 700;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 24px;
+}
+
+.page-title.center {
+    text-align: center;
+}
+
+.muted {
+    color: var(--muted);
+}
+
+label {
+    display: block;
+    opacity: .85;
+    margin-bottom: 4px;
+}
+
+input[type=text],
+input[type=password] {
+    width: 100%;
+    padding: 8px 10px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255,255,255,.12);
+    color: var(--ink);
+    font: inherit;
+}
+
+input::placeholder {
+    color: rgba(255,255,255,.5);
+}
+
+:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
+
+.login-grid {
+    display: grid;
+    grid-template-columns: minmax(0,1fr) 1px minmax(0,1fr);
+    gap: clamp(16px,4vw,32px);
+    align-items: center;
+}
+
+.divider {
+    background: var(--line);
+    align-self: stretch;
+}
+
+.field {
+    margin-bottom: 14px;
+}
+
+.check {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 14px;
+}
+
+.check input {
+    width: 16px;
+    height: 16px;
+    flex: none;
+    margin: 0;
+}
+
+.check label {
+    margin: 0;
+    opacity: 1;
+}
+
+.actions {
+    margin-top: 24px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+}
+
+.msg {
+    min-height: 1.4em;
+    margin-top: 12px;
+    font-weight: 700;
+}
+
+.msg.err {
+    color: #ffe0e8;
+    text-shadow: 0 0 6px #c00;
+}
+
+@media (max-width:640px){
+    .login-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .divider {
+        display: none;
+    }
+}
+
+.shimmer-button {
+    font: 500 18px var(--font-head);
+    color: #fff;
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 12px;
+    padding: 7px 22px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: border-color .4s;
+}
+
+.shimmer-button-normal {
+    font: 500 10px var(--font-head);
+    color: #fff;
+    background: transparent;
+    border: 2px solid #fff;
+    border-radius: 5px;
+    padding: 7px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+    transition: border-color .4s;
+}
+
+.shimmer-button::before,
+.shimmer-button::after {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -60%;
+    width: 220%;
+    height: 220%;
+    background-repeat: no-repeat;
+    background-size: 200% 200%;
+    background-position: 100% 100%;
+    opacity: 0;
+    transition: opacity .3s;
+}
+
+.shimmer-button::before {
+    background-image: linear-gradient(135deg,rgba(255,0,94,0) 30%,rgba(255,0,94,.55) 50%,rgba(255,0,94,0) 70%);
+    filter: blur(24px);
+    z-index: -1;
+}
+
+.shimmer-button::after {
+    background-image: linear-gradient(135deg,rgba(255,125,255,0) 20%,rgba(255,125,255,.45) 50%,rgba(255,125,255,0) 65%);
+    filter: blur(14px);
+    z-index: -2;
+}
+
+.shimmer-button:hover::before,
+.shimmer-button:focus-visible::before {
+    opacity: 1;
+    animation: swirl 2.5s ease-in-out forwards;
+}
+
+.shimmer-button:hover::after,
+.shimmer-button:focus-visible::after {
+    opacity: 1;
+    animation: swirl 3s ease-in-out .2s forwards;
+}
+
+.shimmer-button:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.shimmer-button-normal::before,
+.shimmer-button-normal::after {
+    content: '';
+    position: absolute;
+    top: -60%;
+    left: -60%;
+    width: 220%;
+    height: 220%;
+    background-repeat: no-repeat;
+    background-size: 200% 200%;
+    background-position: 100% 100%;
+    opacity: 0;
+    transition: opacity .3s;
+}
+
+.shimmer-button-normal::before {
+    background-image: linear-gradient(135deg,rgba(255,0,94,0) 30%,rgba(255,0,94,.55) 50%,rgba(255,0,94,0) 70%);
+    filter: blur(24px);
+    z-index: -1;
+}
+
+.shimmer-button-normal::after {
+    background-image: linear-gradient(135deg,rgba(255,125,255,0) 20%,rgba(255,125,255,.45) 50%,rgba(255,125,255,0) 65%);
+    filter: blur(14px);
+    z-index: -2;
+}
+
+.shimmer-button-normal:hover::before,
+.shimmer-button-normal:focus-visible::before {
+    opacity: 1;
+    animation: swirl 2.5s ease-in-out forwards;
+}
+
+.shimmer-button-normal:hover::after,
+.shimmer-button-normal:focus-visible::after {
+    opacity: 1;
+    animation: swirl 3s ease-in-out .2s forwards;
+}
+
+.shimmer-button-normal:disabled {
+    opacity: .6;
+    cursor: wait;
+}
+
+.link-button {
+    background: none;
+    border: 0;
+    color: var(--muted);
+    font: inherit;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+@keyframes swirl{
+    0% {
+        background-position: 100% 100%;
+    }
+
+    60% {
+        background-position: 30% 30%;
+    }
+
+    75% {
+        background-position: 20% 35%;
+    }
+
+    90% {
+        background-position: 35% 20%;
+    }
+
+    100% {
+        background-position: 30% 30%;
+    }
+}
+
+@media (prefers-reduced-motion:reduce){
+    .shimmer-button::before,
+    .shimmer-button::after {
+        animation: none!important;
+    }
+}
+
+.player {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    align-items: center;
+}
+
+.skin {
+    width: 125px;
+    height: 130px;
+    overflow: hidden;
+    border-radius: 8px;
+    flex: none;
+}
+
+.skin iframe {
+    border: 0;
+    width: 480px;
+    height: 188px;
+    max-width: none;
+    transform: scale(.7);
+    transform-origin: top left;
+    background: transparent;
+}
+
+.stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin: 14px 0 0;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--line);
+    font-size: 14px;
+}
+
+.stats dt {
+    display: inline;
+    opacity: .8;
+}
+
+.stats dd {
+    display: inline;
+    margin: 0 0 0 4px;
+    font-weight: 700;
+}
+
+topbar,
+.topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
